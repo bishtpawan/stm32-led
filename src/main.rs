@@ -3,32 +3,27 @@
 
 pub use panic_itm;
 use cortex_m_rt::entry;
+use stm32::{LedArray, Delay, OutputSwitch, init};
 
 #[entry]
 fn main() -> ! {
-    loop {}
+    let (mut delay, mut leds): (Delay, LedArray) = init();
+
+    //let half_period = 500_u16;
+
+    loop {
+        leds[1].on().ok();
+        leds[3].on().ok();
+        leds[5].on().ok();
+        leds[7].on().ok();
+        cortex_m::asm::delay(2000000);
+
+        leds[1].off().ok();
+        leds[3].off().ok();
+        leds[5].off().ok();
+        leds[7].off().ok();
+        cortex_m::asm::delay(2000000);
+
+    }
 }
 
-
-
-/*
-//pub use panic_itm;
-use cortex_m_rt::entry;
-
-use core::panic::PanicInfo;
-
-#[panic_handler]
-fn panic(_panic_info: &PanicInfo) -> ! {
-    loop {}
-}
-
-//#[entry]
-fn main() -> ! {
-    let _company_name = "KNOLDUS";
-    let _practice_area = "RUST_EMBEDDED";
-    let _device_name = "STM32F3DISCOVERY";
-
-    //
-    loop {}
-}
-*/

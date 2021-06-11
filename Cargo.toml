@@ -7,3 +7,5 @@ edition = "2018"
 [dependencies]
 cortex-m-rt = "0.6.13"
 panic-itm = "0.4.2"
+stm32f3-discovery = "0.6.0"
+cortex-m = "0.6.4"
