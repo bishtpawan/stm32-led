@@ -3,24 +3,30 @@
 
 pub use panic_itm;
 use cortex_m_rt::entry;
-use stm32::{LedArray, Delay, OutputSwitch, init};
+use stm32::{LedArray, OutputSwitch, init};
 
 #[entry]
 fn main() -> ! {
-    let (mut delay, mut leds): (Delay, LedArray) = init();
+    init();
 
-    loop {
-        leds[1].on().ok();
-        leds[3].on().ok();
-        leds[5].on().ok();
-        leds[7].on().ok();
-        cortex_m::asm::delay(2000000);
+    unsafe {
+        // A magic address!
+        const GPIOE_BSRR: u32 = 0x48001018;
 
-        leds[1].off().ok();
-        leds[3].off().ok();
-        leds[5].off().ok();
-        leds[7].off().ok();
-        cortex_m::asm::delay(2000000);
+        // Turn on the "North" LED (red)
+        *(GPIOE_BSRR as *mut u32) = 1 << 9;
 
+        // Turn on the "East" LED (green)
+        *(GPIOE_BSRR as *mut u32) = 1 << 11;
+
+        // Turn off the "North" LED
+        *(GPIOE_BSRR as *mut u32) = 1 << (9 + 16);
+
+        // Turn off the "East" LED
+        *(GPIOE_BSRR as *mut u32) = 1 << (11 + 16);
     }
+
+    loop {}
+}
+
 }
