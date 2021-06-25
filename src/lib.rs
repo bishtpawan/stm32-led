@@ -6,20 +6,15 @@ use stm32f3_discovery::stm32f3xx_hal::stm32::GPIOE;
 
 use stm32f3xx_hal::prelude::*;
 pub use stm32f3xx_hal::{
-    delay::Delay,
     gpio::{gpioe, Output, PushPull},
-    hal::blocking::delay::DelayMs,
     stm32
 };
 
-
 pub type LedArray = [Switch<gpioe::PEx<Output<PushPull>>, ActiveHigh>; 8];
 
-pub fn init() -> (Delay, LedArray) {
-
+pub fn init() -> LedArray {
 
     let device_periphs = stm32::Peripherals::take().unwrap();
-    let a = device_periphs.RCC.ahbenr
     let mut reset_and_clock_control = device_periphs.RCC.constrain();
 
     // initialize user leds
@@ -37,7 +32,7 @@ pub fn init() -> (Delay, LedArray) {
         &mut gpioe.otyper,
     );
 
-    (delay, leds.into_array())
+    leds.into_array()
 }
 
 

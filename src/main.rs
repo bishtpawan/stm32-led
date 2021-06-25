@@ -9,8 +9,6 @@ use stm32::{LedArray, Delay, OutputSwitch, init};
 fn main() -> ! {
     let (mut delay, mut leds): (Delay, LedArray) = init();
 
-    //let half_period = 500_u16;
-
     loop {
         leds[1].on().ok();
         leds[3].on().ok();
@@ -26,4 +24,3 @@ fn main() -> ! {
 
     }
 }
-
