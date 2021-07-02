@@ -3,30 +3,44 @@
 
 pub use panic_itm;
 use cortex_m_rt::entry;
-use stm32::{LedArray, OutputSwitch, init};
+pub use stm32f3_discovery::stm32f3xx_hal;
+use stm32f3xx_hal::prelude::*;
+pub use stm32f3xx_hal::stm32;
 
 #[entry]
 fn main() -> ! {
-    init();
+    // initializing device peripherals to access led's pins
+    let device_peripherals = stm32::Peripherals::take().unwrap();
+    let mut rcc = device_peripherals.RCC.constrain();
 
-    unsafe {
-        // A magic address!
-        const GPIOE_BSRR: u32 = 0x48001018;
+    // initialize leds
+    let mut gpioe = device_peripherals.GPIOE.split(&mut rcc.ahb);
 
-        // Turn on the "North" LED (red)
-        *(GPIOE_BSRR as *mut u32) = 1 << 9;
+    // configure LD3
+    gpioe.pe9.into_push_pull_output(&mut gpioe.moder, &mut gpioe.otyper);
+    // configure LD4
+    gpioe.pe8.into_push_pull_output(&mut gpioe.moder, &mut gpioe.otyper);
+    gpioe.pe10.into_push_pull_output(&mut gpioe.moder, &mut gpioe.otyper);
+    gpioe.pe11.into_push_pull_output(&mut gpioe.moder, &mut gpioe.otyper);
+    gpioe.pe12.into_push_pull_output(&mut gpioe.moder, &mut gpioe.otyper);
 
-        // Turn on the "East" LED (green)
-        *(GPIOE_BSRR as *mut u32) = 1 << 11;
+    loop {
+        unsafe {
+            // A magic address!
+            const GPIOE_BSRR: u32 = 0x48001018;
 
-        // Turn off the "North" LED
-        *(GPIOE_BSRR as *mut u32) = 1 << (9 + 16);
+            // Turn on LD3
+            *(GPIOE_BSRR as *mut u32) = 1 << 9;
 
-        // Turn off the "East" LED
-        *(GPIOE_BSRR as *mut u32) = 1 << (11 + 16);
+            // Turn on LD4
+            *(GPIOE_BSRR as *mut u32) = 1 << 8;
+
+            // Turn off LD3
+            *(GPIOE_BSRR as *mut u32) = 1 << 25;
+
+            // Turn off LD4
+            *(GPIOE_BSRR as *mut u32) = 1 << 24;
+        }
     }
-
-    loop {}
 }
 
-}

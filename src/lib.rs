@@ -1,38 +1,22 @@
 #![no_std]
 
-pub use stm32f3_discovery::{leds::Leds, stm32f3xx_hal, switch_hal};
-pub use switch_hal::{ActiveHigh, OutputSwitch, Switch};
-use stm32f3_discovery::stm32f3xx_hal::stm32::GPIOE;
-
+pub use stm32f3_discovery::stm32f3xx_hal;
 use stm32f3xx_hal::prelude::*;
-pub use stm32f3xx_hal::{
-    gpio::{gpioe, Output, PushPull},
-    stm32
-};
+pub use stm32f3xx_hal::stm32;
 
-pub type LedArray = [Switch<gpioe::PEx<Output<PushPull>>, ActiveHigh>; 8];
+pub fn init() {
 
-pub fn init() -> LedArray {
+    // initializing device peripherals to access led's pins
+    let device_peripherals = stm32::Peripherals::take().unwrap();
+    let mut rcc = device_peripherals.RCC.constrain();
 
-    let device_periphs = stm32::Peripherals::take().unwrap();
-    let mut reset_and_clock_control = device_periphs.RCC.constrain();
+    // initialize leds
+    let mut gpioe = device_peripherals.GPIOE.split(&mut rcc.ahb);
 
-    // initialize user leds
-    let mut gpioe = device_periphs.GPIOE.split(&mut reset_and_clock_control.ahb);
-    let leds = Leds::new(
-        gpioe.pe8,
-        gpioe.pe9,
-        gpioe.pe10,
-        gpioe.pe11,
-        gpioe.pe12,
-        gpioe.pe13,
-        gpioe.pe14,
-        gpioe.pe15,
-        &mut gpioe.moder,
-        &mut gpioe.otyper,
-    );
-
-    leds.into_array()
+    // configure led 3
+    gpioe.pe9.into_push_pull_output(&mut gpioe.moder, &mut gpioe.otyper);
+    // configure led 10
+    gpioe.pe13.into_push_pull_output(&mut gpioe.moder, &mut gpioe.otyper);
 }
 
 
